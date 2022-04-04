@@ -1,0 +1,85 @@
+swagger: '2.0'
+info:
+  title: NL Photo Album
+  description: 'Using user text/voice input, search or index photos'
+  version: 1.0.0
+schemes:
+  - https
+basePath: /v1
+produces:
+  - application/json
+paths:
+  /photos/:
+    put:
+      summary: The endpoint indexing user given photos.
+      description: |
+        This API takes in one image with an option to tag with custom labels.
+      tags:
+        - NLU
+      operationId: sendMessage
+      produces:
+        - application/json
+      consumes:
+         - multipart/form-data
+      parameters:
+        - in: body
+          name: upfile
+          type: file
+          required: true
+          description: File to upload.
+        - in: formData
+          name: labels
+          type: string
+          required: false
+          description: Custom labels.
+      responses:
+        '200':
+          description: A Photo upload response
+          schema:
+            type: object
+            properties:
+              success:
+                type: bool
+                description: Success or failure
+              message:
+                type: string
+                description: details of indexing
+        '403':
+          description: Unauthorized
+        '500':
+          description: Unexpected error
+  /search/{q}:
+    get:
+      summary: The endpoint to search in photos based on query.
+      description: |
+        This API takes as input a query and returns all images containing the query objects.
+      tags:
+        - NLU
+      operationId: sendMessage
+      produces:
+        - application/json
+        - image/png
+        - image/jpeg
+        - image/jpg
+      parameters:
+        - in: path
+          name: q
+          type: string
+          required: true
+          description: Query term.
+      responses:
+        '200':
+          description: Search results
+          schema:
+            type: object
+            properties:
+              success:
+                type: bool
+                description: Success or failure
+              images:
+                type: file
+                description: Search results
+        '403':
+          description: Unauthorized
+        '500':
+          description: Unexpected error

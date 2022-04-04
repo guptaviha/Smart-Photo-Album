@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="../static/styles.css">
+</head>
+<body>
+
+    <div class="topnav">
+        <a href="welcome.html">Home</a>
+        <!-- <a class="active" href="login.html">Login</a>
+        <a href="signup.html">Sign Up</a> -->
+        <!-- <a href="feed.html">Feed</a>
+        <a href="users.html">Users</a> -->
+        <a href="search.html">Search</a>
+        <a class="active" href="upload.html">Upload</a>
+        <!-- <a href="welcome.html">Sign Out</a> -->
+    </div>   
+
+    <div class="welcome center">Upload</div>
+
+    <form action="/photos" method="put" >
+      <div class="feedcontainer">
+
+        <label for="upload"><b>Select Image to Upload</b></label>
+        <br>
+        <br>
+        
+        <input type="file" id="myFile" name="filename" required>
+        <br>
+        <br>
+        <hr>
+        <br>
+        
+        <label for="keywords"><b>Optional: Custom Keywords</b></label>
+        <input type="text" name="keywords">
+
+        <button type="submit">Upload</button>
+      </div>
+      
+    </form>
+    
+
+</body>
