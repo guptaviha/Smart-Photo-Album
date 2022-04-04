@@ -22,9 +22,13 @@
     <form action="/search" method="get" style="border: none;">
 
       <div class="feedcontainer">
-          <!-- <label for="search"><b>Search Query</b></label> -->
+        <label for="search"><b>Search Query</b></label>
+        <div style="display: flex;">
           <input type="text" name="search" value="Show me cats" required>
-          <button type="submit">Search</button>
+          <button style="width:none; flex-basis: 50px" type="button" onclick=""> <img src="../static/microphone-favicon.png" height ="30" width="30" /></button>
+        </div>
+
+        <button type="submit">Search</button>
           
       </div>
   
