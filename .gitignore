@@ -1,4 +1,10 @@
+.DS_Store
+
 templates/feed.html
 templates/login.html
 templates/signup.html
 templates/users.html
+
+NL_Photo_Album_swagger.yml
+NL_Photo_Album_swagger2.yml
+NL_Photo_Album_swagger3.yml
