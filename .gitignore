@@ -1,3 +1,4 @@
+# files to ignore
 .DS_Store
 
 templates/feed.html
