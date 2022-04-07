@@ -4,6 +4,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="../static/styles.css">
 </head>
+<script>
+  console.log('Running Script');
+
+  const startTranscribing = () => {
+    console.log('Entered startTranscribing');
+    // const host = 'http://ptsv2.com/t/cvtdm-1649193390';
+    // const url = 'post';
+    const host = 'https://transcribestreaming.us-east-1.amazonaws.com';
+    const url = 'stream-transcription';
+    const endpoint = `${host}/${url}`;
+    const username = 'Viha'
+    const password = 'HW191Daws!'
+    const res = fetch(endpoint, {
+
+      // method: 'POST',
+      // mode: 'cors',
+      // headers: {
+      //   'Content-type': 'application/vnd.amazon.eventstream',
+      //   'Access-Control-Allow-Headers' : '*',
+      //   'Access-Control-Allow-Origin': '*',
+      //   'Access-Control-Allow-Credentials': 'true',
+      //   'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
+      //   'x-amz-target': 'com.amazonaws.transcribe.Transcribe.StartStreamTranscription',
+      //   'x-amz-content-sha256': 'STREAMING-AWS4-HMAC-SHA256-EVENTS',
+      //   'x-amz-date': Date,
+      //   'x-amz-transcribe-language-code': 'en-US',
+      //   // 'x-amz-transcribe-sample-rate': Sample rate,
+      //   'transfer-encoding': 'chunked',
+      //   // 'authorization': 'AWS4-HMAC-SHA256 Credential=AKIAXWUK3N4L2PXBFCFZ/20220406/us-east-1/aws-transcribe/aws4_request, SignedHeaders=host;range;x-amz-date, Signature=fe5f80f77d5fa3beca038a248ff027d0445342fe2855ddc963176630326f1024'
+      //   'Authorization': 'Basic ' + btoa(username + ":" + password)
+      // }
+      // body: "body string"
+
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-type': 'application/json',
+        'Access-Control-Allow-Headers' : '*',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
+      
+      },
+      body: {
+      "TranscriptionJobName": "test-job",
+      "LanguageCode": "en-US",
+      "MediaSampleRateHertz": 44100,
+      "MediaFormat": "mp3",
+      "Media": {
+          "MediaFileUri": "s3://vihas-bucket/show-me-cats.mp3"
+        }
+      }
+    }
+    );
+  }
+
+</script>
 <body>
 
     <div class="topnav">
@@ -19,13 +76,13 @@
 
     <div class="welcome center">Search</div>
 
-    <form action="/search" method="get" style="border: none;">
+    <form action="https://9egv53y2c5.execute-api.us-east-1.amazonaws.com/test/search" method="get" style="border: none;">
 
       <div class="feedcontainer">
         <label for="search"><b>Search Query</b></label>
         <div style="display: flex;">
           <input type="text" name="search" value="Show me cats" required>
-          <button style="width:none; flex-basis: 50px" type="button" onclick=""> <img src="../static/microphone-favicon.png" height ="30" width="30" /></button>
+          <button style="width:none; flex-basis: 50px" type="button" onclick=startTranscribing()> <img src="../static/microphone-favicon.png" height ="30" width="30" /></button>
         </div>
 
         <button type="submit">Search</button>

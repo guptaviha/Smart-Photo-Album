@@ -4,6 +4,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="../static/styles.css">
 </head>
+
+<!-- <script>
+  console.log('Running Script');
+  document.getElementById("UploadButton").onclick = function() {
+    const filename = document.getElementById("myFile");
+    const url = "https://9egv53y2c5.execute-api.us-east-1.amazonaws.com/test/upload?bucket=photo-album-b3&key=" + filename;
+    const form = document.querySelector('#myForm');
+    form.action = url;
+    form.action = url;
+    form.action = url;
+    console.log(url);
+  }
+
+</script> -->
 <body>
 
     <div class="topnav">
@@ -19,7 +33,8 @@
 
     <div class="welcome center">Upload</div>
 
-    <form action="/photos" method="put" style="border: none;">
+
+    <!-- <form id="myForm" method="put" style="border: none;">
       <div class="feedcontainer">
 
         <label for="upload"><b>Select Image to Upload</b></label>
@@ -33,9 +48,29 @@
         <br>
         
         <label for="keywords"><b>Optional: Custom Keywords</b></label>
-        <input type="text" name="keywords">
+        <input type="text" id="myKeywords" name="keywords">
 
-        <button type="submit">Upload</button>
+        <button id="UploadButton" type="submit" >Upload</button>
+      </div> -->
+
+
+    <form action="https://9egv53y2c5.execute-api.us-east-1.amazonaws.com/test/upload" method="put" style="border: none;">
+      <div class="feedcontainer">
+
+        <label for="upload"><b>Select Image to Upload</b></label>
+        <br>
+        <br>
+        
+        <input type="file" id="myFile" name="filename" required>
+        <br>
+        <br>
+        <hr>
+        <br>
+        
+        <label for="keywords"><b>Optional: Custom Keywords</b></label>
+        <input type="text" id="myKeywords" name="keywords">
+
+        <button type="submit" >Upload</button>
       </div>
       
     </form>
