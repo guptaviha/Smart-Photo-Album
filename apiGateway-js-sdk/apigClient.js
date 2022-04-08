@@ -109,7 +109,7 @@ apigClientFactory.newClient = function (config) {
         var uploadBucketKeyPutRequest = {
             verb: 'put'.toUpperCase(),
             path: pathComponent + uritemplate('/upload/{bucket}/{key}').expand(apiGateway.core.utils.parseParametersToObject(params, ['key', 'bucket'])),
-            headers: apiGateway.core.utils.parseParametersToObject(params, []),
+            headers: apiGateway.core.utils.parseParametersToObject(params, ["x-amz-meta-customLabels"]),
             queryParams: apiGateway.core.utils.parseParametersToObject(params, []),
             body: body
         };

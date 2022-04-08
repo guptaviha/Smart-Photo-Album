@@ -5,29 +5,48 @@
     <link rel="stylesheet" type="text/css" href="../static/styles.css">
 </head>
 
-<script type="text/javascript" src="apiGateway-js-sdk/lib/axios/dist/axios.standalone.js"></script>
-<script type="text/javascript" src="apiGateway-js-sdk/lib/CryptoJS/rollups/hmac-sha256.js"></script>
-<script type="text/javascript" src="apiGateway-js-sdk/lib/CryptoJS/rollups/sha256.js"></script>
-<script type="text/javascript" src="apiGateway-js-sdk/lib/CryptoJS/components/hmac.js"></script>
-<script type="text/javascript" src="apiGateway-js-sdk/lib/CryptoJS/components/enc-base64.js"></script>
-<script type="text/javascript" src="apiGateway-js-sdk/lib/url-template/url-template.js"></script>
-<script type="text/javascript" src="apiGateway-js-sdk/lib/apiGatewayCore/sigV4Client.js"></script>
-<script type="text/javascript" src="apiGateway-js-sdk/lib/apiGatewayCore/apiGatewayClient.js"></script>
-<script type="text/javascript" src="apiGateway-js-sdk/lib/apiGatewayCore/simpleHttpClient.js"></script>
-<script type="text/javascript" src="apiGateway-js-sdk/lib/apiGatewayCore/utils.js"></script>
-<script type="text/javascript" src="apiGateway-js-sdk/apigClient.js"></script>
+<script type="text/javascript" src="../apiGateway-js-sdk/lib/axios/dist/axios.standalone.js"></script>
+<script type="text/javascript" src="../apiGateway-js-sdk/lib/CryptoJS/rollups/hmac-sha256.js"></script>
+<script type="text/javascript" src="../apiGateway-js-sdk/lib/CryptoJS/rollups/sha256.js"></script>
+<script type="text/javascript" src="../apiGateway-js-sdk/lib/CryptoJS/components/hmac.js"></script>
+<script type="text/javascript" src="../apiGateway-js-sdk/lib/CryptoJS/components/enc-base64.js"></script>
+<script type="text/javascript" src="../apiGateway-js-sdk/lib/url-template/url-template.js"></script>
+<script type="text/javascript" src="../apiGateway-js-sdk/lib/apiGatewayCore/sigV4Client.js"></script>
+<script type="text/javascript" src="../apiGateway-js-sdk/lib/apiGatewayCore/apiGatewayClient.js"></script>
+<script type="text/javascript" src="../apiGateway-js-sdk/lib/apiGatewayCore/simpleHttpClient.js"></script>
+<script type="text/javascript" src="../apiGateway-js-sdk/lib/apiGatewayCore/utils.js"></script>
+<script type="text/javascript" src="../apiGateway-js-sdk/apigClient.js"></script>
+
+
 
 <!-- <script>
-  console.log('Running Script');
-  document.getElementById("UploadButton").onclick = function() {
-    const filename = document.getElementById("myFile");
-    const url = "https://9egv53y2c5.execute-api.us-east-1.amazonaws.com/test/upload?bucket=photo-album-b3&key=" + filename;
-    const form = document.querySelector('#myForm');
-    form.action = url;
-    form.action = url;
-    form.action = url;
-    console.log(url);
-  }
+  // console.log('Running Script');
+
+  // function upload() {
+  //   const filename = document.getElementById("myFile");
+  //   const url = "https://9egv53y2c5.execute-api.us-east-1.amazonaws.com/test/upload?bucket=photo-album-b3&key=" + filename;
+  //   const form = document.querySelector('#myForm');
+  //   form.action = url;
+  //   form.method = "put";
+  //   console.log(url);
+  // }
+
+  // let btn = document.getElementById("UploadButton")
+  // btn.addEventListener('click', event => {
+  //   upload();
+  // });
+
+
+
+  // document.getElementById("UploadButton").onclick = function() {
+  //   const filename = document.getElementById("myFile");
+  //   const url = "https://9egv53y2c5.execute-api.us-east-1.amazonaws.com/test/upload?bucket=photo-album-b3&key=" + filename;
+  //   const form = document.querySelector('#myForm');
+  //   form.action = url;
+  //   form.action = url;
+  //   form.action = url;
+  //   console.log(url);
+  // }
 
 </script> -->
 <body>
@@ -46,7 +65,8 @@
     <div class="welcome center">Upload</div>
 
 
-    <!-- <form id="myForm" method="put" style="border: none;">
+
+    <!-- <form action="https://9egv53y2c5.execute-api.us-east-1.amazonaws.com/v2/upload" method="put" style="border: none;"> -->
       <div class="feedcontainer">
 
         <label for="upload"><b>Select Image to Upload</b></label>
@@ -62,30 +82,73 @@
         <label for="keywords"><b>Optional: Custom Keywords</b></label>
         <input type="text" id="myKeywords" name="keywords">
 
-        <button id="UploadButton" type="submit" >Upload</button>
-      </div> -->
-
-
-    <form action="https://9egv53y2c5.execute-api.us-east-1.amazonaws.com/v2/upload" method="put" style="border: none;">
-      <div class="feedcontainer">
-
-        <label for="upload"><b>Select Image to Upload</b></label>
-        <br>
-        <br>
-        
-        <input type="file" id="myFile" name="filename" required>
-        <br>
-        <br>
-        <hr>
-        <br>
-        
-        <label for="keywords"><b>Optional: Custom Keywords</b></label>
-        <input type="text" id="myKeywords" name="keywords">
-
-        <button type="submit" >Upload</button>
+        <button id="UploadButton" >Upload</button>
+        <!-- <input type="text" id="inputTextToSave" name="keywords"> -->
+        <!-- <button id="UploadButton" type="submit" >Upload</button> -->
       </div>
       
-    </form>
+    <!-- </form> -->
     
 
 </body>
+
+<script>
+  var sdk = apigClientFactory.newClient({
+    'headers': {
+        // 'Access-Control-Allow-Headers' : 'Content-Type',
+        'Access-Control-Allow-Headers' : '*',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+    },
+    accessKey: 'AKIAXWUK3N4L2PXBFCFZ',
+    secretKey: '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',
+  });
+
+  //   var file = document.getElementById('file').files[0];
+  //   var reader  = new FileReader();
+  //   // it's onload event and you forgot (parameters)
+  //   reader.onload = function(e)  {
+  //       var image = document.createElement("img");
+  //       // the result image data
+  //       image.src = e.target.result;
+  //       document.body.appendChild(image);
+  //    }
+  //    // you have to declare the file loading
+  //    reader.readAsDataURL(file);
+
+  function upload() {
+
+    var filename = document.getElementById('myFile').files[0];
+    console.log("filename", filename);
+    // var file = document.getElementById('myFile')[0].files[0];
+    // console.log("file", file);
+
+
+    var reader  = new FileReader();
+    reader.onload = function(e)  {
+        var image = document.createElement("img");
+        image.src = e.target.result;
+        document.body.appendChild(image);
+     }
+     var img_response = reader.readAsDataURL(filename);
+     console.log("img_response", img_response);
+
+    sdk.uploadBucketKeyPut({
+      "key": filename,
+      "bucket": "photo-album-b3",
+      "x-amz-meta-customLabels": keywords
+    }, {
+      "img": ""
+    }, {})
+  }
+
+  let btn = document.getElementById("UploadButton")
+  console.log("btn", btn);
+  let keywords = document.getElementById("myKeywords")
+  console.log("keywords", keywords);
+  
+  btn.addEventListener('click', event => {
+    console.log("inside event listened");
+    upload();
+  });
+</script>

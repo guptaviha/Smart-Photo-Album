@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
-  title: NL Photo Album
-  description: 'Using user text/voice input, search or index photos'
+  title: AI Photo Search
+  description: 'AI Photo Search application, built during the Cloud and Big Data course at Columbia University.'
   version: 1.0.0
 schemes:
   - https
@@ -9,168 +9,111 @@ basePath: /v1
 produces:
   - application/json
 paths:
-  /photos/:
-    put:
-      summary: The endpoint indexing user given photos.
-      description: |
-        This API takes in one image with an option to tag with custom labels.
-      tags:
-        - NLU
-      operationId: sendMessage
-      produces:
-        - application/json
-      consumes:
-         - multipart/form-data
-      parameters:
-        - in: body
-          name: upfile
-          type: file
-          required: true
-          description: File to upload.
-        - in: formData
-          name: labels
-          type: string
-          required: false
-          description: Custom labels.
-      responses:
-        '200':
-          description: A Photo upload response
-          schema:
-            type: object
-            properties:
-              success:
-                type: bool
-                description: Success or failure
-              message:
-                type: string
-                description: details of indexing
-        '403':
-          description: Unauthorized
-        '500':
-          description: Unexpected error
-  /search/{q}:
+  /search:
     get:
-      summary: The endpoint to search in photos based on query.
+      summary: photo search method
       description: |
-        This API takes as input a query and returns all images containing the query objects.
-      tags:
-        - NLU
-      operationId: sendMessage
-      produces:
-        - application/json
-        - image/png
-        - image/jpeg
-        - image/jpg
+        This API takes in a search query as a query parameter and returns zero or more photos that match the search query.
+      operationId: searchPhotos
       parameters:
-        - in: path
+        - in: query
           name: q
           type: string
-          required: true
-          description: Query term.
+          description: the string to be searched
+      produces:
+        - application/json
       responses:
         '200':
-          description: Search results
+          description: search results
           schema:
-            type: object
-            properties:
-              success:
-                type: bool
-                description: Success or failure
-              images:
-                type: file
-                description: Search results
+            $ref: '#/definitions/SearchResponse'
         '403':
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
         '500':
           description: Unexpected error
-
-
-
-
-# swagger: '2.0'
-# info:
-#   title: NL Photo Album
-#   description: 'Using user text/voice input, search or index photos'
-#   version: 1.0.0
-# schemes:
-#   - https
-# basePath: /v1
-# produces:
-#   - application/json
-# paths:
-#   /photos:
-#     put:
-#       summary: The endpoint indexing user given photos.
-#       description: |
-#         This API takes in one image with an option to tag with custom labels.
-#       tags:
-#         - NLU
-#       operationId: sendMessage
-#       produces:
-#         - application/json
-#       consumes:
-#         - multipart/form-data
-#       parameters:
-#         - in: body
-#           name: user
-#           description: response data
-#           schema:
-#             type: object
-#             required:
-#               - image
-#             properties:
-#               image:
-#                 type: file
-#               labels:
-#                 type: string
-#       responses:
-#         '200':
-#           description: A Photo upload response
-#           schema:
-#             type: object
-#             properties:
-#               success:
-#                 type: bool
-#                 description: Success or failure
-#               message:
-#                 type: string
-#                 description: details of indexing
-#         '403':
-#           description: Unauthorized
-#         '500':
-#           description: Unexpected error
-#   /search/{q}:
-#     get:
-#       summary: The endpoint to search in photos based on query.
-#       description: |
-#         This API takes as input a query and returns all images containing the query objects.
-#       tags:
-#         - NLU
-#       operationId: sendMessage
-#       produces:
-#         - application/json
-#         - image/png
-#         - image/jpeg
-#         - image/jpg
-#       parameters:
-#         - in: path
-#           name: q
-#           type: string
-#           required: true
-#           description: Query term.
-#       responses:
-#         '200':
-#           description: Search results
-#           schema:
-#             type: object
-#             properties:
-#               success:
-#                 type: bool
-#                 description: Success or failure
-#               images:
-#                 type: file
-#                 description: Search results
-#         '403':
-#           description: Unauthorized
-#         '500':
-#           description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    options:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Headers:
+              type: "string"
+  /upload:
+    put:
+      summary: photo upload method
+      description: |
+        This API takes in the multi-part body sent to it (ex. a photo) and uploads it to an S3 bucket.
+      operationId: uploadPhoto
+      consumes:
+        - image/png
+        - image/jpg
+        - image/jpeg
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: S3 PUT operation response
+          schema:
+            type: object
+        '403':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    options:
+      consumes:
+        - image/png
+        - image/jpg
+        - image/jpeg
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Headers:
+              type: "string"
+definitions:
+  SearchResponse:
+    type: object
+    properties:
+      results:
+        type: array
+        items:
+          $ref: '#/definitions/Photo'
+  Photo:
+    type: object
+    properties:
+      url:
+        type: string
+      labels:
+        type: array
+        items:
+          type: string
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
