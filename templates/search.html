@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" type="text/css" href="../static/styles.css">
 </head>
 
@@ -21,56 +23,29 @@
   console.log('Running Script');
 
   const startTranscribing = () => {
-    console.log('Entered startTranscribing');
-    // const host = 'http://ptsv2.com/t/cvtdm-1649193390';
-    // const url = 'post';
-    const host = 'https://transcribestreaming.us-east-1.amazonaws.com';
-    const url = 'stream-transcription';
-    const endpoint = `${host}/${url}`;
-    const username = 'Viha'
-    const password = 'HW191Daws!'
-    const res = fetch(endpoint, {
+    window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
 
-      // method: 'POST',
-      // mode: 'cors',
-      // headers: {
-      //   'Content-type': 'application/vnd.amazon.eventstream',
-      //   'Access-Control-Allow-Headers' : '*',
-      //   'Access-Control-Allow-Origin': '*',
-      //   'Access-Control-Allow-Credentials': 'true',
-      //   'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
-      //   'x-amz-target': 'com.amazonaws.transcribe.Transcribe.StartStreamTranscription',
-      //   'x-amz-content-sha256': 'STREAMING-AWS4-HMAC-SHA256-EVENTS',
-      //   'x-amz-date': Date,
-      //   'x-amz-transcribe-language-code': 'en-US',
-      //   // 'x-amz-transcribe-sample-rate': Sample rate,
-      //   'transfer-encoding': 'chunked',
-      //   // 'authorization': 'AWS4-HMAC-SHA256 Credential=AKIAXWUK3N4L2PXBFCFZ/20220406/us-east-1/aws-transcribe/aws4_request, SignedHeaders=host;range;x-amz-date, Signature=fe5f80f77d5fa3beca038a248ff027d0445342fe2855ddc963176630326f1024'
-      //   'Authorization': 'Basic ' + btoa(username + ":" + password)
-      // }
-      // body: "body string"
+    let finalTranscript = '';
+    let recognition = new window.SpeechRecognition();
 
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-type': 'application/json',
-        'Access-Control-Allow-Headers' : '*',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': 'true',
-        'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
-      
-      },
-      body: {
-      "TranscriptionJobName": "test-job",
-      "LanguageCode": "en-US",
-      "MediaSampleRateHertz": 44100,
-      "MediaFormat": "mp3",
-      "Media": {
-          "MediaFileUri": "s3://vihas-bucket/show-me-cats.mp3"
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 10;
+    recognition.continuous = true;
+
+    recognition.onresult = (event) => {
+      let interimTranscript = '';
+      for (let i = event.resultIndex, len = event.results.length; i < len; i++) {
+        let transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interimTranscript += transcript;
         }
       }
+      document.getElementById('myQuery').value = finalTranscript + interimTranscript;
+      // document.querySelector('body').innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</>';
     }
-    );
+    recognition.start();
   }
 
 </script>
