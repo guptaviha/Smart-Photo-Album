@@ -134,11 +134,11 @@
      console.log("img_response", img_response);
 
     sdk.uploadBucketKeyPut({
-      "key": filename,
+      "key": filename['name'],
       "bucket": "photo-album-b3",
       "x-amz-meta-customLabels": keywords
     }, {
-      "img": ""
+      "img": filename
     }, {})
     
   }
