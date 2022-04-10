@@ -1,0 +1,370 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Photo Album Lambda
+# added Parameters
+Parameters:
+  GitHubRepo:
+    Type: String
+
+  GitHubBranch:
+    Type: String
+
+  GitHubToken:
+    Type: String
+
+  GitHubUser:
+    Type: String
+
+Resources:
+  CFRole:
+    Type: AWS::IAM::Role
+    Properties: 
+      AssumeRolePolicyDocument: {
+                                  "Version": "2012-10-17",
+                                  "Statement": [
+                                    {
+                                      "Effect": "Allow",
+                                      "Principal": {
+                                        "Service": [
+                                          "lambda.amazonaws.com",
+                                          "cloudformation.amazonaws.com",
+                                          "s3.amazonaws.com",
+                                          "apigateway.amazonaws.com"
+                                        ]
+                                      },
+                                      "Action": "sts:AssumeRole"
+                                    }
+                                  ]
+                                }
+      Description: CF Role for lambda functions
+      ManagedPolicyArns: 
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonRekognitionFullAccess
+        - arn:aws:iam::aws:policy/AmazonESFullAccess
+        - arn:aws:iam::aws:policy/AmazonLexFullAccess
+        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+      # change name to?
+      RoleName: CF-role-lambda-fn-3
+
+
+  CFSearchLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: lambda_function_search_CF_3
+      #handler changed
+      Handler: search-photos-lf2.lambda_handler
+      Runtime: python3.6
+      #CodeUri?
+      CodeUri: s3://lambdapipeline-demo-ccbd/3303a86c216dbd3076ca231591d45e27
+      Description: Lambda function for Album search photos
+      MemorySize: 128
+      Timeout: 30
+      Role: !GetAtt CFRole.Arn
+      Environment:
+        Variables:
+          REGION: us-east-1
+    DependsOn : CFRole
+
+
+  CFIndexLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: lambda_function_index_CF_3
+      #handler changed
+      Handler: index-photos-lf1.lambda_handler
+      Runtime: python3.6
+      # CodeUri?
+      CodeUri: s3://lambdapipeline-demo-ccbd/02cd3c2126725e867d7f6ee680f6ca08
+      Description: Lambda function for CD index photos
+      MemorySize: 128
+      Timeout: 30
+      Role: !GetAtt CFRole.Arn
+      Environment:
+        Variables:
+          REGION: us-east-1
+    DependsOn : CFRole
+
+  PhotoBucket:
+    Type: AWS::S3::Bucket
+
+
+  CFES3Instance: 
+    Type: 'AWS::Elasticsearch::Domain'
+    Properties:
+      AdvancedSecurityOptions:
+        Enabled: true
+        InternalUserDatabaseEnabled: true
+        MasterUserOptions:
+          MasterUserName: #Enter username here,
+          MasterUserPassword: #Enter password here
+      DomainEndpointOptions:
+        EnforceHTTPS: true
+      EBSOptions:
+        EBSEnabled: true
+        VolumeSize: 10
+        VolumeType: gp2
+      ElasticsearchClusterConfig:
+        InstanceCount: 1
+        InstanceType: t3.small.elasticsearch
+      ElasticsearchVersion: 7.9
+      EncryptionAtRestOptions:
+        Enabled: true
+      NodeToNodeEncryptionOptions:
+        Enabled: true
+
+
+  CFRestApi:
+    Type: 'AWS::ApiGateway::RestApi'
+    DependsOn:
+      - CFIndexLambda
+      - CFSearchLambda
+    Properties:
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      Body:
+        swagger: '2.0'
+        info:
+          description: >-
+            AI Photo Search application
+          version: '1.0'
+          title: AI Photo Search
+        #added
+        host: 9egv53y2c5.execute-api.us-east-1.amazonaws.com
+        basePath: /v5
+        schemes:
+          - https
+        #need to change these paths
+        paths:
+          /search:
+            get:
+              operationId: searchPhotos
+              consumes:
+                - application/json
+              produces:
+                - application/json
+              parameters:
+                - name: x-api-key
+                  in: header
+                  required: false
+                  type: string
+                - name: query
+                  in: query
+                  required: false
+                  type: string
+              responses:
+                '200':
+                  description: 200 response
+                  schema:
+                    $ref: '#/definitions/SearchResponse'
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: string
+                '403':
+                  description: 403 response
+                  schema:
+                    $ref: '#/definitions/Error'
+                '500':
+                  description: 500 response
+                  schema:
+                    $ref: '#/definitions/Error'
+              security:
+                - api_key: []
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri: !Sub
+                  - >-
+                    arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFuncNameArn}/invocations
+                  - LambdaFuncNameArn: !GetAtt CFSearchLambda.Arn
+                responses:
+                  default:
+                    statusCode: '200'
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: '''*'''
+                requestTemplates:
+                  application/json: |-
+                    {
+                        "query": "$input.params('query')"
+                    }
+                passthroughBehavior: when_no_templates
+                contentHandling: CONVERT_TO_TEXT
+            options:
+              consumes:
+                - application/json
+              produces:
+                - application/json
+              responses:
+                '200':
+                  description: 200 response
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: string
+                    Access-Control-Allow-Methods:
+                      type: string
+                    Access-Control-Allow-Headers:
+                      type: string
+              x-amazon-apigateway-integration:
+                type: mock
+                responses:
+                  default:
+                    statusCode: '200'
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Methods: '''GET,OPTIONS'''
+                      method.response.header.Access-Control-Allow-Headers: >-
+                        'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'
+                      method.response.header.Access-Control-Allow-Origin: '''*'''
+                requestTemplates:
+                  application/json: '{"statusCode": 200}'
+                passthroughBehavior: when_no_match
+          /upload:
+            put:
+              operationId: uploadPhoto
+              produces:
+                - application/json
+              parameters:
+                - name: Content-Type
+                  in: header
+                  required: false
+                  type: string
+                - name: file
+                  in: query
+                  required: true
+                  type: string
+                - name: x-amz-meta-customLabels
+                  in: header
+                  required: false
+                  type: string
+              responses:
+                '200':
+                  description: 200 response
+                  schema:
+                    $ref: '#/definitions/MODELa1c3b7'
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: string
+                '403':
+                  description: 403 response
+                  schema:
+                    $ref: '#/definitions/Error'
+                '500':
+                  description: 500 response
+                  schema:
+                    $ref: '#/definitions/Error'
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: PUT
+                credentials: !GetAtt CFRole.Arn
+                uri: 'arn:aws:apigateway:us-east-1:s3:path/${PhotoBucket}/{file}'
+                responses:
+                  default:
+                    statusCode: '200'
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: '''*'''
+                requestParameters:
+                  integration.request.header.x-amz-meta-customLabels: method.request.header.x-amz-meta-customLabels
+                  integration.request.path.file: method.request.querystring.file
+                  integration.request.header.Content-Type: method.request.header.Content-Type
+                passthroughBehavior: when_no_match
+                contentHandling: CONVERT_TO_BINARY
+            options:
+              consumes:
+                - application/json
+              produces:
+                - application/json
+              responses:
+                '200':
+                  description: 200 response
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: string
+                    Access-Control-Allow-Methods:
+                      type: string
+                    Access-Control-Allow-Headers:
+                      type: string
+              x-amazon-apigateway-integration:
+                type: mock
+                responses:
+                  default:
+                    statusCode: '200'
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Methods: '''OPTIONS,PUT'''
+                      method.response.header.Access-Control-Allow-Headers: >-
+                        'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,x-amz-meta-customLabels'
+                      method.response.header.Access-Control-Allow-Origin: '''*'''
+                requestTemplates:
+                  application/json: '{"statusCode": 200}'
+                passthroughBehavior: when_no_match
+        securityDefinitions:
+          api_key:
+            type: apiKey
+            name: x-api-key
+            in: header
+        definitions:
+          Error:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+          Photo:
+            type: object
+            properties:
+              url:
+                type: string
+              labels:
+                type: array
+                items:
+                  type: string
+          MODELa1c3b7:
+            type: object
+          SearchResponse:
+            type: object
+            properties:
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/Photo'
+        x-amazon-apigateway-gateway-responses:
+          DEFAULT_5XX:
+            responseParameters:
+              gatewayresponse.header.Access-Control-Allow-Methods: '''OPTIONS,PUT'''
+              gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+              gatewayresponse.header.Access-Control-Allow-Headers: >-
+                'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'
+          DEFAULT_4XX:
+            responseParameters:
+              gatewayresponse.header.Access-Control-Allow-Methods: '''OPTIONS,PUT'''
+              gatewayresponse.header.Access-Control-Allow-Origin: '''*'''
+              gatewayresponse.header.Access-Control-Allow-Headers: >-
+                'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'
+        x-amazon-apigateway-binary-media-types:
+          - image/jpeg
+          - image/png
+          - image/jpg
+  CFAPIDeployent:
+    Type: 'AWS::ApiGateway::Deployment'
+    Properties:
+      RestApiId:
+        Ref: CFRestApi
+      Description: RestApi deployment
+      StageName: Stage
+    DependsOn: CFRestApi
+  indexPhotosLambdaS3PermissionProd:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      Principal: s3.amazonaws.com
+      FunctionName:
+        Ref: CFIndexLambda
+      SourceArn: !GetAtt PhotoBucket.Arn
+    DependsOn : 
+      - CFIndexLambda
+      - PhotoBucket
+        
+
+
+  
+      

@@ -70,14 +70,14 @@
     var filename = document.getElementById('myFile').files[0];
     console.log("filename", filename);
 
-    var reader  = new FileReader();
-    reader.onload = function(e)  {
-        var image = document.createElement("img");
-        image.src = e.target.result;
-        document.body.appendChild(image);
-     }
-     var img_response = reader.readAsDataURL(filename);
-     console.log("img_response", img_response);
+    // var reader  = new FileReader();
+    // reader.onload = function(e)  {
+    //     var image = document.createElement("img");
+    //     image.src = e.target.result;
+    //     document.body.appendChild(image);
+    //  }
+    //  var img_response = reader.readAsDataURL(filename);
+    //  console.log("img_response", img_response);
 
     sdk.uploadBucketKeyPut({
       "key": filename['name'],
