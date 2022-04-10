@@ -2,3 +2,4 @@
 .DS_Store
 
 sample-pipeline.yml
+yaml/CF_input_demo.yml
