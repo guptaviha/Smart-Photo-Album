@@ -19,6 +19,38 @@
 <script type="text/javascript" src="../apiGateway-js-sdk/lib/apiGatewayCore/utils.js"></script>
 <script type="text/javascript" src="../apiGateway-js-sdk/apigClient.js"></script>
 
+
+<body>
+    <div class="topnav">
+        <a href="welcome.html">Home</a>
+        <a class="active" href="search.html">Search</a>
+        <a href="upload.html">Upload</a>
+    </div>   
+
+    <div class="welcome center">Search</div>
+
+    <!-- <form action="https://9egv53y2c5.execute-api.us-east-1.amazonaws.com/v5/search" method="get" style="border: none;"> -->
+      <div class="feedcontainer">
+        <label for="search"><b>Search Query</b></label>
+
+        <div style="display: flex;">
+          <input type="text" id="myQuery" name="search" value="Show me cats" required>
+          <button style="width:none; flex-basis: 50px" type="button" onclick=startTranscribing()> <img src="../static/microphone-favicon.png" height ="30" width="30" /></button>
+        </div>
+
+        <!-- <button type="submit">Search</button> -->
+        <button id="mySearchButton" >Search</button>
+          
+      </div>
+    <!-- </form> -->
+
+    <div class="feedcontainer">
+        <label for="results"><b>Results</b></label>
+    </div>
+
+</body>
+
+
 <script>
   console.log('Running Script');
 
@@ -43,48 +75,48 @@
         }
       }
       document.getElementById('myQuery').value = finalTranscript + interimTranscript;
-      // document.querySelector('body').innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</>';
     }
     recognition.start();
   }
 
+  var sdk = apigClientFactory.newClient({
+    'headers': {
+        'Access-Control-Allow-Headers' : '*',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+    },
+    accessKey: 'AKIAXWUK3N4L2PXBFCFZ',
+    secretKey: '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',
+  });
+
+  function search() {
+    let query = document.getElementById("myQuery").value
+    console.log("query", query);
+
+    // var reader  = new FileReader();
+    // reader.onload = function(e)  {
+    //     var image = document.createElement("img");
+    //     image.src = e.target.result;
+    //     document.body.appendChild(image);
+    // }
+    // var img_response = reader.readAsDataURL(filename);
+    // console.log("img_response", img_response);
+
+    sdk.searchGet({
+      "q": query
+    }, {
+      "q": query
+    }, {})
+
+  }
+
+  let btn = document.getElementById("mySearchButton")
+  console.log("btn", btn);
+
+
+  btn.addEventListener('click', event => {
+    console.log("inside event listener");
+    search();
+  });
+
 </script>
-<body>
-
-    <div class="topnav">
-        <a href="welcome.html">Home</a>
-        <!-- <a class="active" href="login.html">Login</a> -->
-        <!-- <a href="signup.html">Sign Up</a> -->
-        <!-- <a href="feed.html">Feed</a>
-        <a href="users.html">Users</a> -->
-        <a class="active" href="search.html">Search</a>
-        <a href="upload.html">Upload</a>
-        <!-- <a href="welcome.html">Sign Out</a> -->
-    </div>   
-
-    <div class="welcome center">Search</div>
-
-    <form action="https://9egv53y2c5.execute-api.us-east-1.amazonaws.com/v2/search" method="get" style="border: none;">
-
-      <div class="feedcontainer">
-        <label for="search"><b>Search Query</b></label>
-        <div style="display: flex;">
-          <input type="text" id="myQuery" name="search" value="Show me cats" required>
-          <button style="width:none; flex-basis: 50px" type="button" onclick=startTranscribing()> <img src="../static/microphone-favicon.png" height ="30" width="30" /></button>
-        </div>
-
-        <button type="submit">Search</button>
-          
-      </div>
-  
-    </form>
-
-    <div class="feedcontainer">
-        <label for="results"><b>Results</b></label>
-        
-    </div>
-  
-
-
-
-</body>
