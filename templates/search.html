@@ -34,7 +34,7 @@
         <label for="search"><b>Search Query</b></label>
 
         <div style="display: flex;">
-          <input type="text" id="myQuery" name="search" value="Show me cats" required>
+          <input type="text" id="myQuery" name="search" value="Show me cat" required>
           <button style="width:none; flex-basis: 50px" type="button" onclick=startTranscribing()> <img src="../static/microphone-favicon.png" height ="30" width="30" /></button>
         </div>
 
@@ -46,6 +46,7 @@
 
     <div class="feedcontainer">
         <label for="results"><b>Results</b></label>
+        <p id="demo"></p>
     </div>
 
 </body>
@@ -89,7 +90,7 @@
     secretKey: 'undjWBLFQr5wtomHaG5PxXybDsMSz+0LrJtVOUVW',
   });
 
-  function search() {
+  const search = async () => {
     let query = document.getElementById("myQuery").value
     console.log("query", query);
 
@@ -102,19 +103,33 @@
     // var img_response = reader.readAsDataURL(filename);
     // console.log("img_response", img_response);
 
-    sdk.searchGet({
+    var response = await sdk.searchGet({
       "q": query
     }, {}, {})
 
+    console.log("response", response);
+    data = response['data']
+    console.log("data", data);
+    let text = "";
+
+    for (let i = 0; i < data.length; i++) {
+      console.log("data[i]", data[i]);
+      const bucket = data[i]['bucket'];
+      const key = data[i]['key'];
+
+      text += `<img src="https://${bucket}.s3.amazonaws.com/${key}"> <br> `
+    }
+    document.getElementById("demo").innerHTML = text;
+    console.log("text", text);
   }
 
   let btn = document.getElementById("mySearchButton")
   console.log("btn", btn);
 
 
-  btn.addEventListener('click', event => {
+  btn.addEventListener('click', async (event) => {
     console.log("inside event listener");
-    search();
+    await search();
   });
 
 </script>

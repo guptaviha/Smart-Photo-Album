@@ -16,6 +16,7 @@
 <script type="text/javascript" src="../apiGateway-js-sdk/lib/apiGatewayCore/simpleHttpClient.js"></script>
 <script type="text/javascript" src="../apiGateway-js-sdk/lib/apiGatewayCore/utils.js"></script>
 <script type="text/javascript" src="../apiGateway-js-sdk/apigClient.js"></script>
+<!-- <script type="module" src="">import {fs} from "fs"</script> -->
 
 
 <body>
@@ -54,6 +55,11 @@
 </body>
 
 <script>
+
+
+
+
+
   var sdk = apigClientFactory.newClient({
     'headers': {
         'Access-Control-Allow-Headers' : '*',
@@ -66,26 +72,52 @@
 
 
   function upload() {
-
+    // var fs = require('fs');
     var filename = document.getElementById('myFile').files[0];
     console.log("filename", filename);
+    // const filepath = "/Users/viha/code/cloud-hw2/" + filename
+
+    // const fileStream = fs.createReadStream(filepath);
+
+    // var data = "<file contents here>";
+    var data = filename;
+
+    var xhr = new XMLHttpRequest();
+    xhr.withCredentials = true;
+
+    xhr.addEventListener("readystatechange", function() {
+      if(this.readyState === 4) {
+        console.log(this.responseText);
+      }
+    });
+
+    xhr.open("PUT", "https://9egv53y2c5.execute-api.us-east-1.amazonaws.com/v8/upload/photo-album-b3/viha");
+    xhr.setRequestHeader("x-amz-meta-customLabels", "viha");
+    xhr.setRequestHeader("X-Amz-Date", "20220411T025245Z");
+    xhr.setRequestHeader("Authorization", "AWS4-HMAC-SHA256 Credential=AKIAXWUK3N4LWKYVHWVW/20220411/us-east-1/execute-api/aws4_request, SignedHeaders=host;x-amz-date, Signature=d690fd826d3dcb7b59a6b25a72f71d89802c5732d382001b3f3de9c5096dea60");
+    xhr.setRequestHeader("Content-Type", "image/jpeg");
+    xhr.setRequestHeader("Access-Control-Allow-Headers", '*');
+    xhr.setRequestHeader("Access-Control-Allow-Origin", '*');
+    xhr.setRequestHeader("Access-Control-Allow-Methods", '*');
+
+    xhr.send(data);
+
 
     // var reader  = new FileReader();
-    // reader.onload = function(e)  {
-    //     var image = document.createElement("img");
-    //     image.src = e.target.result;
-    //     document.body.appendChild(image);
-    //  }
-    //  var img_response = reader.readAsDataURL(filename);
-    //  console.log("img_response", img_response);
-
-    sdk.uploadBucketKeyPut({
-      "key": filename['name'],
-      "bucket": "photo-album-b3",
-      "x-amz-meta-customLabels": keywords
-    }, {
-      "img": filename
-    }, {})
+    // reader.readAsBinaryString(filename);
+    // // let base64Image;
+    // reader.addEventListener("load", () => {
+    // // convert image file to base64 string
+    //   console.log(reader.result);
+    //   // base64Image = reader.result;
+    //   base64Image = reader.result.split('base64,')[1];;
+    //   sdk.uploadBucketKeyPut({
+    //     "key": filename['name'],
+    //     "bucket": "photo-album-b3",
+    //     "x-amz-meta-customLabels": keywords,
+    //   }, base64Image, {})
+    // }, false);
+    // console.log("img_response", img_response);
     
   }
 
