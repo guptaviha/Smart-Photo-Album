@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" type="text/css" href="../static/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" type="text/css" href="../static/styles.css">
 </head>
 
 <script type="text/javascript" src="../apiGateway-js-sdk/lib/axios/dist/axios.standalone.js"></script>
@@ -21,115 +22,95 @@
 
 
 <body>
-    <div class="topnav">
-        <a href="welcome.html">Home</a>
-        <a class="active" href="search.html">Search</a>
-        <a href="upload.html">Upload</a>
-    </div>   
+  <div class="topnav">
+    <a href="welcome.html">Home</a>
+    <a class="active" href="search.html">Search</a>
+    <a href="upload.html">Upload</a>
+  </div>
 
-    <div class="welcome center">Search</div>
+  <div class="welcome center">Search</div>
 
-    <!-- <form action="https://9egv53y2c5.execute-api.us-east-1.amazonaws.com/v5/search" method="get" style="border: none;"> -->
-      <div class="feedcontainer">
-        <label for="search"><b>Search Query</b></label>
+  <div class="feedcontainer">
+    <label for="search"><b>Search Query</b></label>
 
-        <div style="display: flex;">
-          <input type="text" id="myQuery" name="search" value="Show me cat" required>
-          <button style="width:none; flex-basis: 50px" type="button" onclick=startTranscribing()> <img src="../static/microphone-favicon.png" height ="30" width="30" /></button>
-        </div>
-
-        <!-- <button type="submit">Search</button> -->
-        <button id="mySearchButton" >Search</button>
-          
-      </div>
-    <!-- </form> -->
-
-    <div class="feedcontainer">
-        <label for="results"><b>Results</b></label>
-        <p id="demo"></p>
+    <div style="display: flex;">
+      <input type="text" id="myQuery" name="search" value="Show me cat" required>
+      <button style="width:none; flex-basis: 50px" type="button" onclick=startTranscribing()> <img
+          src="../static/microphone-favicon.png" height="30" width="30" /></button>
     </div>
 
-</body>
+    <button id="mySearchButton">Search</button>
 
+  </div>
 
-<script>
-  console.log('Running Script');
+  <div class="feedcontainer">
+    <label for="results"><b>Results</b></label>
+    <p id="demo"></p>
+  </div>
 
-  const startTranscribing = () => {
-    window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+  <script>
 
-    let finalTranscript = '';
-    let recognition = new window.SpeechRecognition();
+    const startTranscribing = () => {
+      window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
 
-    recognition.interimResults = true;
-    recognition.maxAlternatives = 10;
-    recognition.continuous = true;
+      let finalTranscript = '';
+      let recognition = new window.SpeechRecognition();
 
-    recognition.onresult = (event) => {
-      let interimTranscript = '';
-      for (let i = event.resultIndex, len = event.results.length; i < len; i++) {
-        let transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalTranscript += transcript;
-        } else {
-          interimTranscript += transcript;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 10;
+      recognition.continuous = true;
+
+      recognition.onresult = (event) => {
+        let interimTranscript = '';
+        for (let i = event.resultIndex, len = event.results.length; i < len; i++) {
+          let transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+          } else {
+            interimTranscript += transcript;
+          }
         }
+        document.getElementById('myQuery').value = finalTranscript + interimTranscript;
       }
-      document.getElementById('myQuery').value = finalTranscript + interimTranscript;
+      recognition.start();
     }
-    recognition.start();
-  }
 
-  var sdk = apigClientFactory.newClient({
-    'headers': {
-        'Access-Control-Allow-Headers' : '*',
+    var sdk = apigClientFactory.newClient({
+      'headers': {
+        'Access-Control-Allow-Headers': '*',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
-    },
-    accessKey: 'AKIAXWUK3N4L2PXBFCFZ',
-    secretKey: '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',
-  });
+      },
+      accessKey: 'AKIAXWUK3N4L2PXBFCFZ',
+      secretKey: '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',
+    });
 
-  const search = async () => {
-    let query = document.getElementById("myQuery").value
-    console.log("query", query);
+    const search = async () => {
+      let query = document.getElementById("myQuery").value
 
-    // var reader  = new FileReader();
-    // reader.onload = function(e)  {
-    //     var image = document.createElement("img");
-    //     image.src = e.target.result;
-    //     document.body.appendChild(image);
-    // }
-    // var img_response = reader.readAsDataURL(filename);
-    // console.log("img_response", img_response);
+      var response = await sdk.searchGet({
+        "q": query
+      }, {}, {})
 
-    var response = await sdk.searchGet({
-      "q": query
-    }, {}, {})
+      data = response['data']
+      let text = "";
 
-    console.log("response", response);
-    data = response['data']
-    console.log("data", data);
-    let text = "";
+      for (let i = 0; i < data.length; i++) {
+        const bucket = data[i]['bucket'];
+        const key = data[i]['key'];
 
-    for (let i = 0; i < data.length; i++) {
-      console.log("data[i]", data[i]);
-      const bucket = data[i]['bucket'];
-      const key = data[i]['key'];
-
-      text += `<img src="https://${bucket}.s3.amazonaws.com/${key}"> <br> `
+        text += `<img src="https://${bucket}.s3.amazonaws.com/${key}"> <br> `
+      }
+      document.getElementById("demo").innerHTML = text;
     }
-    document.getElementById("demo").innerHTML = text;
-    console.log("text", text);
-  }
 
-  let btn = document.getElementById("mySearchButton")
-  console.log("btn", btn);
+    let btn = document.getElementById("mySearchButton")
 
 
-  btn.addEventListener('click', async (event) => {
-    console.log("inside event listener");
-    await search();
-  });
+    btn.addEventListener('click', async (event) => {
+      await search();
+    });
 
-</script>
+  </script>
+
+</body>

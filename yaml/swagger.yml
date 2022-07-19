@@ -89,7 +89,26 @@ paths:
         in: "path"
         required: true
         type: "string"
-      responses: {}
+      responses:
+        "200":
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/PutResponse"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Headers:
+              type: "string"
+        "500":
+          description: "500 response"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "403 response"
+          schema:
+            $ref: "#/definitions/Error"
     options:
       consumes:
       - "application/json"
@@ -130,3 +149,8 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/Photo"
+  PutResponse:
+    type: "object"
+    properties:
+      message:
+        type: "string"

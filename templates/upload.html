@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="../static/styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="../static/styles.css">
 </head>
 
 <script type="text/javascript" src="../apiGateway-js-sdk/lib/axios/dist/axios.standalone.js"></script>
@@ -16,118 +17,105 @@
 <script type="text/javascript" src="../apiGateway-js-sdk/lib/apiGatewayCore/simpleHttpClient.js"></script>
 <script type="text/javascript" src="../apiGateway-js-sdk/lib/apiGatewayCore/utils.js"></script>
 <script type="text/javascript" src="../apiGateway-js-sdk/apigClient.js"></script>
-<!-- <script type="module" src="">import {fs} from "fs"</script> -->
 
 
 <body>
 
-    <div class="topnav">
-        <a href="welcome.html">Home</a>
-        <a href="search.html">Search</a>
-        <a class="active" href="upload.html">Upload</a>
-    </div>   
+  <div class="topnav">
+    <a href="welcome.html">Home</a>
+    <a href="search.html">Search</a>
+    <a class="active" href="upload.html">Upload</a>
+  </div>
 
-    <div class="welcome center">Upload</div>
+  <div class="welcome center">Upload</div>
 
-    <!-- <form action="https://9egv53y2c5.execute-api.us-east-1.amazonaws.com/v2/upload" method="put" style="border: none;"> -->
-      <div class="feedcontainer">
+  <div class="feedcontainer">
 
-        <label for="upload"><b>Select Image to Upload</b></label>
-        <br>
-        <br>
-        
-        <input type="file" id="myFile" name="filename" required>
-        <br>
-        <br>
-        <hr>
-        <br>
-        
-        <label for="keywords"><b>Optional: Custom Keywords</b></label>
-        <input type="text" id="myKeywords" name="keywords">
+    <label for="upload"><b>Select Image to Upload</b></label>
+    <br>
+    <br>
 
-        <button id="myUploadButton" >Upload</button>
-        <!-- <button id="UploadButton" type="submit" >Upload</button> -->
-      </div>
-      
-    <!-- </form> -->
-    
+    <input type="file" id="myFile" name="filename" required>
+    <br>
+    <br>
+    <hr>
+    <br>
 
-</body>
+    <label for="keywords"><b>Optional: Custom Keywords</b></label>
+    <input type="text" id="myKeywords" name="keywords">
 
-<script>
+    <button id="myUploadButton">Upload</button>
+  </div>
 
+  <script>
 
-
-
-
-  var sdk = apigClientFactory.newClient({
-    'headers': {
-        'Access-Control-Allow-Headers' : '*',
+    var sdk = apigClientFactory.newClient({
+      'headers': {
+        'Access-Control-Allow-Headers': '*',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
-    },
-    accessKey: 'AKIAXWUK3N4L2PXBFCFZ',
-    secretKey: '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',
-  });
-
-
-  function upload() {
-    // var fs = require('fs');
-    var filename = document.getElementById('myFile').files[0];
-    console.log("filename", filename);
-    // const filepath = "/Users/viha/code/cloud-hw2/" + filename
-
-    // const fileStream = fs.createReadStream(filepath);
-
-    // var data = "<file contents here>";
-    var data = filename;
-
-    var xhr = new XMLHttpRequest();
-    xhr.withCredentials = true;
-
-    xhr.addEventListener("readystatechange", function() {
-      if(this.readyState === 4) {
-        console.log(this.responseText);
-      }
+      },
+      accessKey: 'AKIAXWUK3N4L2PXBFCFZ',
+      secretKey: 'undjWBLFQr5wtomHaG5PxXybDsMSz',
+      region: 'us-east-1',
+      defaultContentType: 'image/png'
     });
 
-    xhr.open("PUT", "https://9egv53y2c5.execute-api.us-east-1.amazonaws.com/v8/upload/photo-album-b3/viha");
-    xhr.setRequestHeader("x-amz-meta-customLabels", "viha");
-    xhr.setRequestHeader("X-Amz-Date", "20220411T025245Z");
-    xhr.setRequestHeader("Authorization", "AWS4-HMAC-SHA256 Credential=AKIAXWUK3N4LWKYVHWVW/20220411/us-east-1/execute-api/aws4_request, SignedHeaders=host;x-amz-date, Signature=d690fd826d3dcb7b59a6b25a72f71d89802c5732d382001b3f3de9c5096dea60");
-    xhr.setRequestHeader("Content-Type", "image/jpeg");
-    xhr.setRequestHeader("Access-Control-Allow-Headers", '*');
-    xhr.setRequestHeader("Access-Control-Allow-Origin", '*');
-    xhr.setRequestHeader("Access-Control-Allow-Methods", '*');
+    function getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          let encoded = reader.result.replace(/^data:(.*;base64,)?/, "");
+          if (encoded.length % 4 > 0) {
+            encoded += "=".repeat(4 - (encoded.length % 4));
+          }
+          resolve(encoded);
+        };
+        reader.onerror = (error) => reject(error);
+      });
+    }
 
-    xhr.send(data);
 
+    function upload() {
+      var filename = document.getElementById('myFile').files[0];
+      var data = filename;
+      var xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
 
-    // var reader  = new FileReader();
-    // reader.readAsBinaryString(filename);
-    // // let base64Image;
-    // reader.addEventListener("load", () => {
-    // // convert image file to base64 string
-    //   console.log(reader.result);
-    //   // base64Image = reader.result;
-    //   base64Image = reader.result.split('base64,')[1];;
-    //   sdk.uploadBucketKeyPut({
-    //     "key": filename['name'],
-    //     "bucket": "photo-album-b3",
-    //     "x-amz-meta-customLabels": keywords,
-    //   }, base64Image, {})
-    // }, false);
-    // console.log("img_response", img_response);
-    
-  }
+      xhr.addEventListener("readystatechange", function () {
+        if (this.readyState === 4) {
+          console.log(this.responseText);
+        }
+      });
 
-  let btn = document.getElementById("myUploadButton")
-  console.log("btn", btn);
-  let keywords = document.getElementById("myKeywords")
-  console.log("keywords", keywords);
-  
-  btn.addEventListener('click', event => {
-    console.log("inside event listener");
-    upload();
-  });
-</script>
+      var contentType = "image/";
+      const myArray = filename['name'].split(".");
+      if (myArray.list > 1) {
+        contentType += myArray[1];
+      } else {
+        contentType += 'png';
+      }
+
+      xhr.open("PUT", "https://9egv53y2c5.execute-api.us-east-1.amazonaws.com/v8/upload/photo-album-b3/" + filename['name']);
+      xhr.setRequestHeader("x-amz-meta-customLabels", keywords.value);
+      xhr.setRequestHeader("X-Amz-Date", "20220411T025245Z");
+      xhr.setRequestHeader("Authorization", "AWS4-HMAC-SHA256 Credential=AKIAXWUK3N4LWKYVHWVW/20220411/us-east-1/execute-api/aws4_request, SignedHeaders=host;x-amz-date, Signature=d690fd826d3dcb7b59a6b25a72f71d89802c5732d382001b3f3de9c5096dea60");
+      xhr.setRequestHeader("Content-Type", filename.type);
+      xhr.setRequestHeader("Access-Control-Allow-Headers", '*');
+      xhr.setRequestHeader("Access-Control-Allow-Origin", '*');
+      xhr.setRequestHeader("Access-Control-Allow-Methods", '*');
+
+      xhr.send(data);
+
+    }
+
+    let btn = document.getElementById("myUploadButton")
+    let keywords = document.getElementById("myKeywords")
+
+    btn.addEventListener('click', event => {
+      upload();
+    });
+  </script>
+
+</body>
