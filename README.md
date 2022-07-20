@@ -10,4 +10,4 @@ For more details: [Prompt](https://github.com/guptaviha/Smart-Photo-Album/blob/m
 ### Contributors
 
 [![](https://github.com/guptaviha.png?size=50)](https://github.com/guptaviha)
-[![](https://https://github.com/AatmanMantri.png?size=50)](https://https://github.com/AatmanMantri)
+[![](https://github.com/AatmanMantri.png?size=50)](https://github.com/AatmanMantri)
