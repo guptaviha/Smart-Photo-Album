@@ -1,4 +1,4 @@
-# A Natural Language based Photo Album Cloud Application
+# Smart Photo Album
 
 An academic assignment for Cloud Computing (CS-GY-9233) at NYU Tandon with Prof Sambit Sahu.
 
