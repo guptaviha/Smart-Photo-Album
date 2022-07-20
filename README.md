@@ -4,8 +4,7 @@ An academic assignment for Cloud Computing (CS-GY-9233) at NYU Tandon with Prof 
 
 Objective: To implement a cloud-based photo album webapp, that can be searched using natural language through both text and voice.
 
-For more details: [Prompt](https://github.com/guptaviha/Smart-Photo-Album/blob/main/Smart-Photo-Album
--Prompt.pdf)
+For more details: [Prompt](https://github.com/guptaviha/Smart-Photo-Album/blob/main/Smart-Photo-Album-Prompt.pdf)
 
 ### Contributors
 
